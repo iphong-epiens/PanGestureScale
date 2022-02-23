@@ -7,6 +7,10 @@
 
 import UIKit
 
+enum ResizeOption: Int {
+    case smaller = 0, bigger, none
+}
+
 class ViewController: UIViewController {
     @IBOutlet weak var targetImgView: UIImageView!
     @IBOutlet weak var enlargeImgView: UIImageView!
@@ -29,9 +33,9 @@ class ViewController: UIViewController {
         
         panGesture = UIPanGestureRecognizer(target: self, action: #selector(dragImg))
         targetPanGesture = UIPanGestureRecognizer(target: self, action: #selector(dragTargetImg))
-
+        
         targetImgView.addGestureRecognizer(targetPanGesture)
-
+        
         enlargeImgView.addGestureRecognizer(panGesture)
         enlargeImgView.isUserInteractionEnabled = true
         enlargeImgView.layer.cornerRadius = enlargeImgView.frame.width/2
@@ -53,90 +57,27 @@ class ViewController: UIViewController {
         
         if sender.state == .began {
             lastSwipeBeginningPoint = sender.location(in: sender.view)
-        } else if sender.state == .ended {
+        } else { //} if sender.state == .ended {
             guard let beginPoint = lastSwipeBeginningPoint else {
                 return
             }
             
             let endPoint = sender.location(in: sender.view)
             // TODO: use the x and y coordinates of endPoint and beginPoint to determine which direction the swipe occurred.
+                        
+            let resizeCondition = isResizeTargetView(beginPoint: beginPoint,
+                                                endPoint: endPoint)
             
-            print("beginPoint", beginPoint, "endPoint", endPoint)
+            guard resizeCondition != .none else { return }
             
             let distance = CGPointDistance(from: beginPoint, to: endPoint)
-            print("distance", distance)
             
-            let lastOuterImgFrame = targetImgView.frame
+            let bottomTrailingPoint = CGPoint(x: enlargeImgView.center.x + translation.x, y: enlargeImgView.center.y + translation.y)
             
-            let resultRightBottomPoint = CGPoint(x: enlargeImgView.center.x + translation.x, y: enlargeImgView.center.y + translation.y)
-            
-            var isLeft = false, isRight = false, isUp = false, isDown = false
-            var resultRect = CGRect(x: 0, y: 0, width: 0, height: 0)
-            
-            var resultWidth: CGFloat = 0
-            var resultHeight: CGFloat = 0
-            
-            var resultSize = CGSize(width: 0, height: 0)
-            var resultOrigin = CGPoint(x: 0, y: 0)
-            
-            if endPoint.x > beginPoint.x {
-                print("turn right")
-                isRight = true
-            }
-            if endPoint.x < beginPoint.x {
-                print("turn left")
-                isLeft = true
-            }
-            
-            if endPoint.y > beginPoint.y {
-                print("turn down")
-                isDown = true
-            }
-            
-            if endPoint.y < beginPoint.y {
-                print("turn up")
-                isUp = true
-            }
-            
-            if isLeft && isUp {
-                print("smaller")
-                
-                let changedWidth = lastOuterImgFrame.width - (distance * 2)
-                
-                if changedWidth > orgImgViewSize.width/4 {
-                    resultWidth = lastOuterImgFrame.width - (distance * 2)
-                    resultHeight = lastOuterImgFrame.height - (distance * 2)
-                } else {
-                    print("too small!")
-                    resultWidth = orgImgViewSize.width/4
-                    resultHeight = orgImgViewSize.height/4
-                }
-            }
-            
-            if isRight && isDown {
-                print("bigger")
-                
-                let changedWidth = lastOuterImgFrame.width + (distance * 2)
-                
-                if changedWidth > UIScreen.main.bounds.width * 0.75 {
-                    print("too big!")
-                    resultWidth = UIScreen.main.bounds.width * 0.75
-                    resultHeight = resultWidth * imageRatio
-                } else {
-                    resultWidth = lastOuterImgFrame.width + (distance * 2)
-                    resultHeight = lastOuterImgFrame.height + (distance * 2)
-                }
-            }
-            
-            resultSize = CGSize(width: resultWidth, height: resultHeight)
-
-            resultOrigin = CGPoint(x: resultRightBottomPoint.x - resultWidth + 5,
-                                   y: resultRightBottomPoint.y - resultHeight + 5)
-            
-            resultRect = CGRect(origin: resultOrigin, size: resultSize)
-            
-            print("resultWidth", resultWidth, "resultHeight", resultHeight)
-            
+           let resultRect = resizeTargetView(resizeCondition,
+                                             distance: distance,
+                                             bottomTrailingPoint: bottomTrailingPoint)
+                        
             let lastCenterPos = targetImgView.center
             
             targetImgView.frame = resultRect
@@ -144,7 +85,7 @@ class ViewController: UIViewController {
             
             enlargeImgView.center = CGPoint(x: targetImgView.frame.maxX - 5, y: targetImgView.frame.maxY - 5)
             closeBtn.center = CGPoint(x: targetImgView.frame.maxX - 5, y: targetImgView.frame.origin.y + 5)
-
+            
             sender.setTranslation(CGPoint.zero, in: self.view)
         }
     }
@@ -156,8 +97,90 @@ class ViewController: UIViewController {
         
         enlargeImgView.center = CGPoint(x: targetImgView.frame.maxX - 5, y: targetImgView.frame.maxY - 5)
         closeBtn.center = CGPoint(x: targetImgView.frame.maxX - 5, y: targetImgView.frame.origin.y + 5)
-
+        
         sender.setTranslation(CGPoint.zero, in: self.view)
+    }
+    
+    func isResizeTargetView(beginPoint: CGPoint, endPoint: CGPoint) -> ResizeOption {
+        var resizeOption: ResizeOption = .none
+        
+        var isLeft = false, isRight = false, isUp = false, isDown = false
+        
+        if endPoint.x > beginPoint.x {
+            isRight = true
+        }
+        if endPoint.x < beginPoint.x {
+            isLeft = true
+        }
+        
+        if endPoint.y > beginPoint.y {
+            isDown = true
+        }
+        
+        if endPoint.y < beginPoint.y {
+            isUp = true
+        }
+        
+        if isLeft && isUp {
+            print("smaller")
+            resizeOption = .smaller
+        }
+        else if isRight && isDown {
+            print("bigger")
+            resizeOption = .bigger
+        }
+        
+        return resizeOption
+    }
+    
+    func resizeTargetView(_ resizeOption: ResizeOption, distance: CGFloat, bottomTrailingPoint: CGPoint) -> CGRect {
+        var resultRect = CGRect(x: 0, y: 0, width: 0, height: 0)
+        
+        var resultWidth: CGFloat = 0
+        var resultHeight: CGFloat = 0
+        
+        var resultSize = CGSize(width: 0, height: 0)
+        var resultOrigin = CGPoint(x: 0, y: 0)
+        
+        let lastOuterImgFrame = targetImgView.frame
+
+        switch resizeOption {
+        case .smaller:
+            let changedWidth = lastOuterImgFrame.width - (distance * 2)
+            
+            if changedWidth > orgImgViewSize.width/4 {
+                resultWidth = lastOuterImgFrame.width - (distance * 2)
+                resultHeight = lastOuterImgFrame.height - (distance * 2)
+            } else {
+                print("too small!")
+                resultWidth = orgImgViewSize.width/4
+                resultHeight = orgImgViewSize.height/4
+            }
+            
+        case .bigger:
+            let changedWidth = lastOuterImgFrame.width + (distance * 2)
+            
+            if changedWidth > UIScreen.main.bounds.width * 0.75 {
+                print("too big!")
+                resultWidth = UIScreen.main.bounds.width * 0.75
+                resultHeight = resultWidth * imageRatio
+            } else {
+                resultWidth = lastOuterImgFrame.width + (distance * 2)
+                resultHeight = lastOuterImgFrame.height + (distance * 2)
+            }
+            
+        default:
+            break
+        }
+        
+        resultSize = CGSize(width: resultWidth, height: resultHeight)
+        
+        resultOrigin = CGPoint(x: bottomTrailingPoint.x - resultWidth + 5,
+                               y: bottomTrailingPoint.y - resultHeight + 5)
+        
+        resultRect = CGRect(origin: resultOrigin, size: resultSize)
+        
+        return resultRect
     }
     
     func CGPointDistanceSquared(from: CGPoint, to: CGPoint) -> CGFloat {
