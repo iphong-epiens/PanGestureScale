@@ -8,21 +8,36 @@
 import UIKit
 
 class ViewController: UIViewController {
-    @IBOutlet weak var outerImgView: UIImageView!
-    @IBOutlet weak var innerImgView: UIImageView!
-    var panGesture  = UIPanGestureRecognizer()
+    @IBOutlet weak var targetImgView: UIImageView!
+    @IBOutlet weak var enlargeImgView: UIImageView!
+    @IBOutlet weak var closeBtn: UIButton!
+
+    var panGesture = UIPanGestureRecognizer()
     private var lastSwipeBeginningPoint: CGPoint?
-    private var lastDistance: CGFloat = 0
+    private var testImg = UIImage(named: "mj")!
+    private var orgImgViewSize = CGSize(width: 0, height: 0)
+    private var imageRatio: CGFloat = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+       
+        targetImgView.layer.borderColor = UIColor.gray.cgColor
+        targetImgView.layer.borderWidth = 1
         
         panGesture = UIPanGestureRecognizer(target: self, action: #selector(ViewController.dragImg(_:)))
-        innerImgView.isUserInteractionEnabled = true
-        innerImgView.addGestureRecognizer(panGesture)
+        enlargeImgView.addGestureRecognizer(panGesture)
+        enlargeImgView.isUserInteractionEnabled = true
+        enlargeImgView.layer.cornerRadius = enlargeImgView.frame.width/2
+        enlargeImgView.center = CGPoint(x: targetImgView.frame.maxX - 5, y: targetImgView.frame.maxY - 5)
         
-        innerImgView.center = CGPoint(x: outerImgView.frame.maxX - 5, y: outerImgView.frame.maxY - 5)
+        orgImgViewSize = targetImgView.frame.size
+        imageRatio = targetImgView.frame.width/targetImgView.frame.height
+        
+        print("imageRatio",imageRatio)
+        
+        closeBtn.layer.cornerRadius = closeBtn.frame.width/2
+        closeBtn.center = CGPoint(x: targetImgView.frame.maxX - 5, y: targetImgView.frame.origin.y + 5)
     }
     
     @objc func dragImg(_ sender:UIPanGestureRecognizer){
@@ -45,10 +60,10 @@ class ViewController: UIViewController {
             let distance = CGPointDistance(from: beginPoint, to: endPoint)
             print("distance", distance)
             
-            let lastOuterImgFrame = outerImgView.frame
+            let lastOuterImgFrame = targetImgView.frame
             
-            let resultRightBottomPoint = CGPoint(x: innerImgView.center.x + translation.x, y: innerImgView.center.y + translation.y)
-                        
+            let resultRightBottomPoint = CGPoint(x: enlargeImgView.center.x + translation.x, y: enlargeImgView.center.y + translation.y)
+            
             var isLeft = false, isRight = false, isUp = false, isDown = false
             var resultRect = CGRect(x: 0, y: 0, width: 0, height: 0)
             
@@ -80,48 +95,51 @@ class ViewController: UIViewController {
             if isLeft && isUp {
                 print("smaller")
                 
-                resultWidth = lastOuterImgFrame.width - (distance * 2)
-                resultHeight = lastOuterImgFrame.height - (distance * 2)
+                let changedWidth = lastOuterImgFrame.width - (distance * 2)
                 
-                resultSize = CGSize(width: resultWidth, height: resultHeight)
+                if changedWidth > orgImgViewSize.width/4 {
+                    resultWidth = lastOuterImgFrame.width - (distance * 2)
+                    resultHeight = lastOuterImgFrame.height - (distance * 2)
+                } else {
+                    print("too small!")
+                    resultWidth = orgImgViewSize.width/4
+                    resultHeight = orgImgViewSize.height/4
+                }
             }
             
             if isRight && isDown {
                 print("bigger")
                 
-                resultWidth = lastOuterImgFrame.width + (distance * 2)
-                resultHeight = lastOuterImgFrame.height + (distance * 2)
+                let changedWidth = lastOuterImgFrame.width + (distance * 2)
                 
-                resultSize = CGSize(width: resultWidth, height: resultHeight)
+                if changedWidth > UIScreen.main.bounds.width * 0.75 {
+                    print("too big!")
+                    resultWidth = UIScreen.main.bounds.width * 0.75
+                    resultHeight = resultWidth * imageRatio
+                } else {
+                    resultWidth = lastOuterImgFrame.width + (distance * 2)
+                    resultHeight = lastOuterImgFrame.height + (distance * 2)
+                }
             }
             
-            if resultWidth < 30 {
-                print("too small!")
-                return
-            }
+            resultSize = CGSize(width: resultWidth, height: resultHeight)
+
+            resultOrigin = CGPoint(x: resultRightBottomPoint.x - resultWidth + 5,
+                                   y: resultRightBottomPoint.y - resultHeight + 5)
             
-            if resultWidth > UIScreen.main.bounds.width - 40 {
-                print("too big!")
-                return
-            }
-            
-            resultOrigin = CGPoint(x: resultRightBottomPoint.x - resultWidth + 5, y: resultRightBottomPoint.y - resultHeight + 5)
             resultRect = CGRect(origin: resultOrigin, size: resultSize)
             
             print("resultWidth", resultWidth, "resultHeight", resultHeight)
             
-            let lastCenter = outerImgView.center
+            let lastCenterPos = targetImgView.center
             
-            outerImgView.frame = resultRect
-            outerImgView.center = lastCenter
+            targetImgView.frame = resultRect
+            targetImgView.center = lastCenterPos
             
-            innerImgView.center = CGPoint(x: outerImgView.frame.maxX - 5, y: outerImgView.frame.maxY - 5)
-            
-            sender.setTranslation(CGPoint.zero, in: self.view)
+            enlargeImgView.center = CGPoint(x: targetImgView.frame.maxX - 5, y: targetImgView.frame.maxY - 5)
+            closeBtn.center = CGPoint(x: targetImgView.frame.maxX - 5, y: targetImgView.frame.origin.y + 5)
 
-            //            outerImgView.transform = CGAffineTransform(scaleX: 0.2, y: 0.2)
-            //
-            //            outerImgView.center = CGPoint(x: outerImgView.center.x + translation.x, y: outerImgView.center.y + translation.y)
+            sender.setTranslation(CGPoint.zero, in: self.view)
         }
     }
     
@@ -134,4 +152,3 @@ class ViewController: UIViewController {
         return sqrt(input)
     }
 }
-
