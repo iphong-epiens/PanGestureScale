@@ -46,7 +46,7 @@ class ViewController: UIViewController {
         targetImgView.layer.borderWidth = 1
 
         targetImgSize = targetImg.size
-        targetImgRatio = targetImg.size.width/targetImg.size.height
+        targetImgRatio = max(targetImgSize.width, targetImgSize.height)
         
         print("targetImgRatio", targetImgRatio)
     }
@@ -154,7 +154,7 @@ class ViewController: UIViewController {
         case .smaller:
             let changedWidth = lastOuterImgFrame.width - (distance * 2)
         
-            let minLength = targetImgSize.width/4
+            let minLength = targetImgSize.width * 0.25
             var targetLength: CGFloat = 0
 
             if changedWidth > minLength {
@@ -164,7 +164,7 @@ class ViewController: UIViewController {
                 targetLength = minLength
             }
             
-            let scaleFactor = targetLength / max(targetImgSize.width, targetImgSize.height)
+            let scaleFactor = targetLength / targetImgRatio
 
             resultWidth = targetImgSize.width * scaleFactor
             resultHeight = targetImgSize.height * scaleFactor
@@ -182,7 +182,7 @@ class ViewController: UIViewController {
                 targetLength = changedWidth
             }
             
-            let scaleFactor = targetLength / max(targetImgSize.width, targetImgSize.height)
+            let scaleFactor = targetLength / targetImgRatio
 
             resultWidth = targetImgSize.width * scaleFactor
             resultHeight = targetImgSize.height * scaleFactor
