@@ -11,8 +11,10 @@ class ViewController: UIViewController {
     @IBOutlet weak var targetImgView: UIImageView!
     @IBOutlet weak var enlargeImgView: UIImageView!
     @IBOutlet weak var closeBtn: UIButton!
-
+    
+    var targetPanGesture = UIPanGestureRecognizer()
     var panGesture = UIPanGestureRecognizer()
+    
     private var lastSwipeBeginningPoint: CGPoint?
     private var testImg = UIImage(named: "mj")!
     private var orgImgViewSize = CGSize(width: 0, height: 0)
@@ -21,11 +23,15 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-       
+        targetImgView.isUserInteractionEnabled = true
         targetImgView.layer.borderColor = UIColor.gray.cgColor
         targetImgView.layer.borderWidth = 1
         
-        panGesture = UIPanGestureRecognizer(target: self, action: #selector(ViewController.dragImg(_:)))
+        panGesture = UIPanGestureRecognizer(target: self, action: #selector(dragImg))
+        targetPanGesture = UIPanGestureRecognizer(target: self, action: #selector(dragTargetImg))
+
+        targetImgView.addGestureRecognizer(targetPanGesture)
+
         enlargeImgView.addGestureRecognizer(panGesture)
         enlargeImgView.isUserInteractionEnabled = true
         enlargeImgView.layer.cornerRadius = enlargeImgView.frame.width/2
@@ -141,6 +147,17 @@ class ViewController: UIViewController {
 
             sender.setTranslation(CGPoint.zero, in: self.view)
         }
+    }
+    
+    @objc func dragTargetImg(_ sender:UIPanGestureRecognizer) {
+        let translation = sender.translation(in: self.view)
+        
+        targetImgView.center = CGPoint(x: targetImgView.center.x + translation.x, y: targetImgView.center.y + translation.y)
+        
+        enlargeImgView.center = CGPoint(x: targetImgView.frame.maxX - 5, y: targetImgView.frame.maxY - 5)
+        closeBtn.center = CGPoint(x: targetImgView.frame.maxX - 5, y: targetImgView.frame.origin.y + 5)
+
+        sender.setTranslation(CGPoint.zero, in: self.view)
     }
     
     func CGPointDistanceSquared(from: CGPoint, to: CGPoint) -> CGFloat {
