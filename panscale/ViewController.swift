@@ -20,13 +20,33 @@ class ViewController: UIViewController {
     var panGesture = UIPanGestureRecognizer()
     
     private var lastSwipeBeginningPoint: CGPoint?
-    private var targetImg = UIImage(named: "mandalorian")!
     private var targetImgSize = CGSize(width: 0, height: 0)
     private var targetImgRatio: CGFloat = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
+        targetPanGesture = UIPanGestureRecognizer(target: self, action: #selector(dragTargetImg))
+        targetImgView.addGestureRecognizer(targetPanGesture)
+        
+        let targetImg = UIImage(named: "poster")!
+
+        targetImgView.image = targetImg
+        targetImgSize = targetImg.size
+        targetImgRatio = max(targetImgSize.width, targetImgSize.height)
+        
+        let maxLength = UIScreen.main.bounds.width * 0.5
+        let scaleFactor = maxLength / targetImgRatio
+        let targetImgFrame = CGSize(width: targetImgSize.width * scaleFactor,
+                                    height: targetImgSize.height * scaleFactor)
+
+        targetImgView.frame = CGRect(origin: CGPoint(x: 0, y: 0), size: targetImgFrame)
+        targetImgView.center = self.view.center
+        
+        targetImgView.isUserInteractionEnabled = true
+        targetImgView.layer.borderColor = UIColor.darkGray.cgColor
+        targetImgView.layer.borderWidth = 1
         
         closeBtn.layer.cornerRadius = closeBtn.frame.width/2
         closeBtn.center = CGPoint(x: targetImgView.frame.maxX - 5, y: targetImgView.frame.origin.y + 5)
@@ -37,18 +57,6 @@ class ViewController: UIViewController {
         enlargeImgView.isUserInteractionEnabled = true
         enlargeImgView.layer.cornerRadius = enlargeImgView.frame.width/2
         enlargeImgView.center = CGPoint(x: targetImgView.frame.maxX - 5, y: targetImgView.frame.maxY - 5)
-        
-        targetPanGesture = UIPanGestureRecognizer(target: self, action: #selector(dragTargetImg))
-        targetImgView.addGestureRecognizer(targetPanGesture)
-        
-        targetImgView.isUserInteractionEnabled = true
-        targetImgView.layer.borderColor = UIColor.gray.cgColor
-        targetImgView.layer.borderWidth = 1
-
-        targetImgSize = targetImg.size
-        targetImgRatio = max(targetImgSize.width, targetImgSize.height)
-        
-        print("targetImgRatio", targetImgRatio)
     }
     
     @objc func dragImg(_ sender:UIPanGestureRecognizer){
@@ -141,21 +149,20 @@ class ViewController: UIViewController {
     
     func resizeTargetView(_ resizeOption: ResizeOption, distance: CGFloat, bottomTrailingPoint: CGPoint) -> CGRect {
         var resultRect = CGRect(x: 0, y: 0, width: 0, height: 0)
-        
         var resultWidth: CGFloat = 0
         var resultHeight: CGFloat = 0
-        
-        var resultSize = CGSize(width: 0, height: 0)
         var resultOrigin = CGPoint(x: 0, y: 0)
-        
+        var resultSize = CGSize(width: 0, height: 0)
+
+        var scaleFactor: CGFloat = 0
+        var targetLength: CGFloat = 0
+        var changedWidth: CGFloat = 0
         let lastOuterImgFrame = targetImgView.frame
         
         switch resizeOption {
         case .smaller:
-            let changedWidth = lastOuterImgFrame.width - (distance * 2)
-        
+            changedWidth = lastOuterImgFrame.width - (distance * 2)
             let minLength = targetImgSize.width * 0.25
-            var targetLength: CGFloat = 0
 
             if changedWidth > minLength {
                 targetLength = changedWidth
@@ -163,17 +170,10 @@ class ViewController: UIViewController {
                 print("too small!")
                 targetLength = minLength
             }
-            
-            let scaleFactor = targetLength / targetImgRatio
-
-            resultWidth = targetImgSize.width * scaleFactor
-            resultHeight = targetImgSize.height * scaleFactor
-            
+                        
         case .bigger:
-            let changedWidth = lastOuterImgFrame.width + (distance * 2)
-
+            changedWidth = lastOuterImgFrame.width + (distance * 2)
             let maxLength = UIScreen.main.bounds.width * 0.75
-            var targetLength: CGFloat = 0
             
             if changedWidth > maxLength {
                 print("too big!")
@@ -182,14 +182,14 @@ class ViewController: UIViewController {
                 targetLength = changedWidth
             }
             
-            let scaleFactor = targetLength / targetImgRatio
-
-            resultWidth = targetImgSize.width * scaleFactor
-            resultHeight = targetImgSize.height * scaleFactor
-            
         default:
             break
         }
+
+        scaleFactor = targetLength / targetImgRatio
+
+        resultWidth = targetImgSize.width * scaleFactor
+        resultHeight = targetImgSize.height * scaleFactor
         
         resultSize = CGSize(width: resultWidth, height: resultHeight)
         
