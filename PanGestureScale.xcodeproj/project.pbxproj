@@ -40,7 +40,7 @@
 		2EB675B527C5B5D600F0965A = {
 			isa = PBXGroup;
 			children = (
-				2EB675C027C5B5D600F0965A /* panscale */,
+				2EB675C027C5B5D600F0965A /* PanGestureScale */,
 				2EB675BF27C5B5D600F0965A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -53,7 +53,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		2EB675C027C5B5D600F0965A /* panscale */ = {
+		2EB675C027C5B5D600F0965A /* PanGestureScale */ = {
 			isa = PBXGroup;
 			children = (
 				2EB675C127C5B5D600F0965A /* AppDelegate.swift */,
@@ -64,7 +64,7 @@
 				2EB675CC27C5B5D700F0965A /* LaunchScreen.storyboard */,
 				2EB675CF27C5B5D700F0965A /* Info.plist */,
 			);
-			path = panscale;
+			path = PanGestureScale;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -291,7 +291,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = UV36497CVB;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = panscale/Info.plist;
+				INFOPLIST_FILE = PanGestureScale/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -319,7 +319,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = UV36497CVB;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = panscale/Info.plist;
+				INFOPLIST_FILE = PanGestureScale/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
