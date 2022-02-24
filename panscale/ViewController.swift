@@ -33,7 +33,6 @@ class ViewController: UIViewController {
         targetPinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(pinchTargetImg))
         targetTapGesture = UITapGestureRecognizer(target: self, action: #selector(tapTargetImg))
         targetImgView.gestureRecognizers = [targetTapGesture, targetPanGesture, targetPinchGesture]
-        
         targetTapGesture.require(toFail: targetTapGesture)
         
         let targetImg = UIImage(named: "poster")!
@@ -98,9 +97,10 @@ class ViewController: UIViewController {
             
             let resizeValue = CGPointDistance(from: beginPoint, to: endPoint)
             
-            let bottomTrailingPoint = CGPoint(x: enlargeImgView.center.x + translation.x, y: enlargeImgView.center.y + translation.y)
+            let bottomTrailingPoint = CGPoint(x: enlargeImgView.center.x + translation.x,
+                                              y: enlargeImgView.center.y + translation.y)
             
-            let resultRect = resizeTargetView(resizeCondition,
+            let resultRect = getTargetViewRect(resizeCondition,
                                               resizeValue: resizeValue,
                                               bottomTrailingPoint: bottomTrailingPoint)
             
@@ -183,7 +183,7 @@ class ViewController: UIViewController {
         return resizeOption
     }
     
-    func resizeTargetView(_ resizeOption: ResizeOption, resizeValue: CGFloat, bottomTrailingPoint: CGPoint) -> CGRect {
+    func getTargetViewRect(_ resizeOption: ResizeOption, resizeValue: CGFloat, bottomTrailingPoint: CGPoint) -> CGRect {
         var resultRect = CGRect(x: 0, y: 0, width: 0, height: 0)
         var resultWidth: CGFloat = 0
         var resultHeight: CGFloat = 0
