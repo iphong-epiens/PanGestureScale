@@ -1,6 +1,6 @@
 //
 //  ViewController.swift
-//  panscale
+//  PanGestureScale
 //
 //  Created by Inpyo Hong on 2022/02/23.
 //

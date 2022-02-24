@@ -16,7 +16,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		2EB675BE27C5B5D600F0965A /* panscale.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = panscale.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2EB675BE27C5B5D600F0965A /* PanGestureScale.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PanGestureScale.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2EB675C127C5B5D600F0965A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2EB675C327C5B5D600F0965A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		2EB675C527C5B5D600F0965A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -48,7 +48,7 @@
 		2EB675BF27C5B5D600F0965A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				2EB675BE27C5B5D600F0965A /* panscale.app */,
+				2EB675BE27C5B5D600F0965A /* PanGestureScale.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -70,9 +70,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		2EB675BD27C5B5D600F0965A /* panscale */ = {
+		2EB675BD27C5B5D600F0965A /* PanGestureScale */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2EB675D227C5B5D700F0965A /* Build configuration list for PBXNativeTarget "panscale" */;
+			buildConfigurationList = 2EB675D227C5B5D700F0965A /* Build configuration list for PBXNativeTarget "PanGestureScale" */;
 			buildPhases = (
 				2EB675BA27C5B5D600F0965A /* Sources */,
 				2EB675BB27C5B5D600F0965A /* Frameworks */,
@@ -82,9 +82,9 @@
 			);
 			dependencies = (
 			);
-			name = panscale;
+			name = PanGestureScale;
 			productName = panscale;
-			productReference = 2EB675BE27C5B5D600F0965A /* panscale.app */;
+			productReference = 2EB675BE27C5B5D600F0965A /* PanGestureScale.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -102,7 +102,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 2EB675B927C5B5D600F0965A /* Build configuration list for PBXProject "panscale" */;
+			buildConfigurationList = 2EB675B927C5B5D600F0965A /* Build configuration list for PBXProject "PanGestureScale" */;
 			compatibilityVersion = "Xcode 13.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -115,7 +115,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				2EB675BD27C5B5D600F0965A /* panscale */,
+				2EB675BD27C5B5D600F0965A /* PanGestureScale */,
 			);
 		};
 /* End PBXProject section */
@@ -341,7 +341,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		2EB675B927C5B5D600F0965A /* Build configuration list for PBXProject "panscale" */ = {
+		2EB675B927C5B5D600F0965A /* Build configuration list for PBXProject "PanGestureScale" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2EB675D027C5B5D700F0965A /* Debug */,
@@ -350,7 +350,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		2EB675D227C5B5D700F0965A /* Build configuration list for PBXNativeTarget "panscale" */ = {
+		2EB675D227C5B5D700F0965A /* Build configuration list for PBXNativeTarget "PanGestureScale" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2EB675D327C5B5D700F0965A /* Debug */,
