@@ -107,7 +107,7 @@ class ViewController: UIViewController {
             
             let lastCenterPos = targetImgView.center
             
-            UIView.animate(withDuration: 0, delay: 0.1, options: .curveEaseOut) { [weak self] in
+            UIView.animate(withDuration: 0.1) { [weak self] in
                 guard let self = self else { return }
                 self.targetImgView.frame = resultRect
                 self.targetImgView.center = lastCenterPos
@@ -128,7 +128,7 @@ class ViewController: UIViewController {
     @objc func dragTargetImg(_ sender: UIPanGestureRecognizer) {
         let translation = sender.translation(in: self.view)
         
-        UIView.animate(withDuration: 0, delay: 0.1, options: .curveEaseOut) { [weak self] in
+        UIView.animate(withDuration: 0.1) { [weak self] in
             guard let self = self else { return }
             self.targetImgView.center = CGPoint(x: self.targetImgView.center.x + translation.x, y: self.targetImgView.center.y + translation.y)
             
