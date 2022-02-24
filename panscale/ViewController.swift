@@ -54,18 +54,17 @@ class ViewController: UIViewController {
         targetImgView.isMultipleTouchEnabled = true
         targetImgView.layer.borderColor = UIColor.darkGray.cgColor
         targetImgView.layer.borderWidth = 1
-        
-        targetPanGesture = UIPanGestureRecognizer(target: self, action: #selector(dragTargetImg))
-        closeBtn.addTarget(self, action: #selector(tapCloseBtn), for: .touchUpInside)
-        closeBtn.layer.cornerRadius = closeBtn.frame.width/2
-        closeBtn.center = CGPoint(x: targetImgView.frame.maxX - 5, y: targetImgView.frame.origin.y + 5)
-        
+                
         panGesture = UIPanGestureRecognizer(target: self, action: #selector(dragImg))
         enlargeImgView.addGestureRecognizer(panGesture)
         
         enlargeImgView.isUserInteractionEnabled = true
         enlargeImgView.layer.cornerRadius = enlargeImgView.frame.width/2
         enlargeImgView.center = CGPoint(x: targetImgView.frame.maxX - 5, y: targetImgView.frame.maxY - 5)
+        
+        closeBtn.addTarget(self, action: #selector(tapCloseBtn), for: .touchUpInside)
+        closeBtn.layer.cornerRadius = closeBtn.frame.width/2
+        closeBtn.center = CGPoint(x: targetImgView.frame.maxX - 5, y: targetImgView.frame.origin.y + 5)
     }
 
     @objc func tapCloseBtn(_ sender: AnyObject){
@@ -77,7 +76,7 @@ class ViewController: UIViewController {
         }
     }
   
-    @objc func dragImg(_ sender:UIPanGestureRecognizer){
+    @objc func dragImg(_ sender:UIPanGestureRecognizer) {
         let translation = sender.translation(in: self.view)
         
         print("translation",translation)
@@ -97,12 +96,12 @@ class ViewController: UIViewController {
             
             guard resizeCondition != .none else { return }
             
-            let distance = CGPointDistance(from: beginPoint, to: endPoint)
+            let resizeValue = CGPointDistance(from: beginPoint, to: endPoint)
             
             let bottomTrailingPoint = CGPoint(x: enlargeImgView.center.x + translation.x, y: enlargeImgView.center.y + translation.y)
             
             let resultRect = resizeTargetView(resizeCondition,
-                                              distance: distance,
+                                              resizeValue: resizeValue,
                                               bottomTrailingPoint: bottomTrailingPoint)
             
             let lastCenterPos = targetImgView.center
@@ -123,7 +122,6 @@ class ViewController: UIViewController {
     @objc func tapTargetImg(_ sender: UITapGestureRecognizer) {
         print(#function)
     }
-    
     
     @objc func dragTargetImg(_ sender: UIPanGestureRecognizer) {
         let translation = sender.translation(in: self.view)
@@ -185,7 +183,7 @@ class ViewController: UIViewController {
         return resizeOption
     }
     
-    func resizeTargetView(_ resizeOption: ResizeOption, distance: CGFloat, bottomTrailingPoint: CGPoint) -> CGRect {
+    func resizeTargetView(_ resizeOption: ResizeOption, resizeValue: CGFloat, bottomTrailingPoint: CGPoint) -> CGRect {
         var resultRect = CGRect(x: 0, y: 0, width: 0, height: 0)
         var resultWidth: CGFloat = 0
         var resultHeight: CGFloat = 0
@@ -199,7 +197,7 @@ class ViewController: UIViewController {
         
         switch resizeOption {
         case .smaller:
-            changedWidth = lastOuterImgFrame.width - (distance * 2)
+            changedWidth = lastOuterImgFrame.width - (resizeValue * 2)
             let minLength = targetImgSize.width * 0.25
 
             if changedWidth > minLength {
@@ -210,7 +208,7 @@ class ViewController: UIViewController {
             }
                         
         case .bigger:
-            changedWidth = lastOuterImgFrame.width + (distance * 2)
+            changedWidth = lastOuterImgFrame.width + (resizeValue * 2)
             let maxLength = UIScreen.main.bounds.width * 0.75
             
             if changedWidth > maxLength {
