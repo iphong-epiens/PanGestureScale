@@ -17,6 +17,8 @@ class ViewController: UIViewController {
     @IBOutlet weak var closeBtn: UIButton!
     
     var targetPanGesture = UIPanGestureRecognizer()
+    var targetPinchGesture = UIPinchGestureRecognizer()
+    var targetTapGesture = UITapGestureRecognizer()
     var panGesture = UIPanGestureRecognizer()
     
     private var lastSwipeBeginningPoint: CGPoint?
@@ -28,7 +30,11 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view.
         
         targetPanGesture = UIPanGestureRecognizer(target: self, action: #selector(dragTargetImg))
-        targetImgView.addGestureRecognizer(targetPanGesture)
+        targetPinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(pinchTargetImg))
+        targetTapGesture = UITapGestureRecognizer(target: self, action: #selector(tapTargetImg))
+        targetImgView.gestureRecognizers = [targetTapGesture, targetPanGesture, targetPinchGesture]
+        
+        targetTapGesture.require(toFail: targetTapGesture)
         
         let targetImg = UIImage(named: "poster")!
 
@@ -45,9 +51,12 @@ class ViewController: UIViewController {
         targetImgView.center = self.view.center
         
         targetImgView.isUserInteractionEnabled = true
+        targetImgView.isMultipleTouchEnabled = true
         targetImgView.layer.borderColor = UIColor.darkGray.cgColor
         targetImgView.layer.borderWidth = 1
         
+        targetPanGesture = UIPanGestureRecognizer(target: self, action: #selector(dragTargetImg))
+        closeBtn.addTarget(self, action: #selector(tapCloseBtn), for: .touchUpInside)
         closeBtn.layer.cornerRadius = closeBtn.frame.width/2
         closeBtn.center = CGPoint(x: targetImgView.frame.maxX - 5, y: targetImgView.frame.origin.y + 5)
         
@@ -58,7 +67,16 @@ class ViewController: UIViewController {
         enlargeImgView.layer.cornerRadius = enlargeImgView.frame.width/2
         enlargeImgView.center = CGPoint(x: targetImgView.frame.maxX - 5, y: targetImgView.frame.maxY - 5)
     }
-    
+
+    @objc func tapCloseBtn(_ sender: AnyObject){
+        UIView.animate(withDuration: 0.1) { [weak self] in
+            guard let self = self else { return }
+            self.enlargeImgView.removeFromSuperview()
+            self.closeBtn.removeFromSuperview()
+            self.targetImgView.removeFromSuperview()
+        }
+    }
+  
     @objc func dragImg(_ sender:UIPanGestureRecognizer){
         let translation = sender.translation(in: self.view)
         
@@ -102,7 +120,12 @@ class ViewController: UIViewController {
         }
     }
     
-    @objc func dragTargetImg(_ sender:UIPanGestureRecognizer) {
+    @objc func tapTargetImg(_ sender: UITapGestureRecognizer) {
+        print(#function)
+    }
+    
+    
+    @objc func dragTargetImg(_ sender: UIPanGestureRecognizer) {
         let translation = sender.translation(in: self.view)
         
         UIView.animate(withDuration: 0, delay: 0.1, options: .curveEaseOut) { [weak self] in
@@ -113,6 +136,21 @@ class ViewController: UIViewController {
             self.closeBtn.center = CGPoint(x: self.targetImgView.frame.maxX - 5, y: self.targetImgView.frame.origin.y + 5)
         }
         sender.setTranslation(CGPoint.zero, in: self.view)
+    }
+    
+    @objc func pinchTargetImg(_ sender: UIPinchGestureRecognizer) {
+        guard let gestureView = sender.view else {
+          return
+        }
+
+        gestureView.transform = gestureView.transform.scaledBy(
+          x: sender.scale,
+          y: sender.scale
+        )
+        sender.scale = 1
+        
+        self.enlargeImgView.center = CGPoint(x: self.targetImgView.frame.maxX - 5, y: self.targetImgView.frame.maxY - 5)
+        self.closeBtn.center = CGPoint(x: self.targetImgView.frame.maxX - 5, y: self.targetImgView.frame.origin.y + 5)
     }
     
     func isResizeTargetView(beginPoint: CGPoint, endPoint: CGPoint) -> ResizeOption {
@@ -209,4 +247,13 @@ class ViewController: UIViewController {
         let input = CGPointDistanceSquared(from: from, to: to)
         return sqrt(input)
     }
+}
+
+extension ViewController: UIGestureRecognizerDelegate {
+  func gestureRecognizer(
+    _ gestureRecognizer: UIGestureRecognizer,
+    shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+  ) -> Bool {
+    return true
+  }
 }
